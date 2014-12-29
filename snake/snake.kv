@@ -2,7 +2,7 @@
 <SnakeHead>
     canvas:
         Triangle:
-            points: (self.x, self.height+self.y, self.x, self.y, self.width+self.x, self.height/2+self.y)
+            points: (self.x, self.y, self.x-self.width, self.y+self.height/2, self.x-self.width, self.y-self.height/2)
 
 <SnakeGame>:
     snake: snake_head
@@ -19,5 +19,6 @@
         height: root.height/10
         x: root.center_x
         y: root.center_y
+        velocity: self.width
 
 

@@ -1,3 +1,5 @@
+import kivy
+kivy.require("1.8.0")
 from kivy.app import App
 from kivy.uix.widget import Widget
 from kivy.properties import \
@@ -37,7 +39,7 @@ class PongGame(Widget):
     player2 = ObjectProperty(None)
 
     def serve_ball(self, vel=(4, 0)):
-        self.ball.centrer = self.center
+        self.ball.center = self.center
         self.ball.velocity = vel
 
     def update(self, dt):

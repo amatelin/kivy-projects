@@ -1,0 +1,23 @@
+#:kivy 1.8.0
+<SnakeHead>
+    canvas:
+        Triangle:
+            points: (self.x, self.height+self.y, self.x, self.y, self.width+self.x, self.height/2+self.y)
+
+<SnakeGame>:
+    snake: snake_head
+
+    Label:
+        font_size: 70
+        center_x: root.width/4
+        top: root.top - 50
+        text: "0"
+
+    SnakeHead:
+        id: snake_head
+        width: root.width/20
+        height: root.height/10
+        x: root.center_x
+        y: root.center_y
+
+

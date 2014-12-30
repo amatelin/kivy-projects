@@ -13,15 +13,28 @@ from kivy.vector import Vector
 
 class SnakeHead(Widget):
     direction = OptionProperty(
-        "Right", options=["Up", "Down", "Left", "Right"])
+        "Up", options=["Up", "Down", "Left", "Right"])
+    next_direction = OptionProperty(
+        "Up", options=["Up", "Down", "Left", "Right"])
     points = ListProperty([0] * 6)
-    x_position = NumericProperty(0)
+    x_position = NumericProperty(1)
     y_position = NumericProperty(1)
     position = ReferenceListProperty(x_position, y_position)
 
     def move(self):
-        if self.direction == "Right":
+        self.direction = self.next_direction
+        if self.direction == "Right": 
             self.position[0] += 1
+        elif self.direction == "Left":
+            self.position[0] -= 1
+        elif self.direction == "Up":
+            self.position[1] += 1
+        elif self.direction == "Down":
+            self.position[1] -= 1
+
+    def render(self):
+        print self.position
+        if self.direction == "Right":
             x0 = self.position[0] * self.width
             y0 = self.position[1] * self.height / 2
             x1 = x0 - self.width
@@ -29,7 +42,6 @@ class SnakeHead(Widget):
             x2 = x0 - self.width
             y2 = y0 - self.height / 2
         elif self.direction == "Left":
-            self.position[0] -= 1
             x0 = (self.position[0] - 1) * self.width
             y0 = self.position[1] * self.height / 2
             x1 = x0 + self.width
@@ -37,7 +49,6 @@ class SnakeHead(Widget):
             x2 = x0 + self.width
             y2 = y0 + self.height / 2
         elif self.direction == "Up":
-            self.position[1] += 1
             x0 = self.position[0] * self.width / 2
             y0 = self.position[1] * self.height
             x1 = x0 - self.width / 2
@@ -45,7 +56,6 @@ class SnakeHead(Widget):
             x2 = x0 + self.width / 2
             y2 = y0 - self.height
         elif self.direction == "Down":
-            self.position[1] -= 1
             x0 = self.position[0] * self.width / 2
             y0 = (self.position[1] - 1) * self.height
             x1 = x0 + self.width / 2
@@ -54,6 +64,7 @@ class SnakeHead(Widget):
             y2 = y0 + self.height
 
         self.points = [x0, y0, x1, y1, x2, y2]
+        # print self.points
 
 
 class SnakeGame(Widget):
@@ -67,6 +78,7 @@ class SnakeGame(Widget):
         pass
 
     def update(self, dt):
+        self.snake.render()
         self.snake.move()
 
         # out of bounds
@@ -88,14 +100,14 @@ class SnakeGame(Widget):
         and (abs(delta[0]) > 0.15 or abs(delta[1]) > 0.20):
             if abs(delta[0]) > abs(delta[1]):
                 if delta[0] > 0:
-                    self.snake.direction = "Right"
+                    self.snake.next_direction = "Right"
                 else:
-                    self.snake.direction = "Left"
+                    self.snake.next_direction = "Left"
             else:
                 if delta[1] > 0:
-                    self.snake.direction = "Up"
+                    self.snake.next_direction = "Up"
                 else:
-                    self.snake.direction = "Down"
+                    self.snake.next_direction = "Down"
             self.mov_triggered = True
 
 

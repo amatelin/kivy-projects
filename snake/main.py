@@ -19,15 +19,13 @@ class Snake(Widget):
     def move(self):
         next_tail_pos = list(self.head.position)
         self.head.move()
-        self.head.render()
         self.tail.add_block(next_tail_pos)
-        self.tail.render()
 
     def set_next_direction(self, direction):
-        self.head.next_direction = direction
+        self.head.direction = direction
 
 class SnakeTail(Widget):
-    tail_size = NumericProperty(5)
+    tail_size = NumericProperty(2)
     blocks_positions = ListProperty()
     tail_blocks = ListProperty()
     block = ObjectProperty(None)
@@ -36,9 +34,7 @@ class SnakeTail(Widget):
         self.blocks_positions.append(pos)
         if len(self.blocks_positions)>self.tail_size:
             self.blocks_positions.pop(0)
-        print self.blocks_positions
 
-    def render(self):
         with self.canvas:
             for block_pos in self.blocks_positions:
                 x = (block_pos[0]-0.5)*self.width
@@ -49,12 +45,10 @@ class SnakeTail(Widget):
                 if len(self.tail_blocks)>self.tail_size:
                     last_block = self.tail_blocks.pop(0)
                     self.canvas.remove(last_block)
-                print self.tail_blocks
+
 
 class SnakeHead(Widget):
     direction = OptionProperty(
-        "Right", options=["Up", "Down", "Left", "Right"])
-    next_direction = OptionProperty(
         "Right", options=["Up", "Down", "Left", "Right"])
     points = ListProperty([0] * 6)
     x_position = NumericProperty(10)
@@ -62,20 +56,9 @@ class SnakeHead(Widget):
     position = ReferenceListProperty(x_position, y_position)
 
     def move(self):
-        self.direction = self.next_direction
-        if self.direction == "Right": 
-            self.position[0] += 1
-        elif self.direction == "Left":
-            self.position[0] -= 1
-        elif self.direction == "Up":
-            self.position[1] += 1
-        elif self.direction == "Down":
-            self.position[1] -= 1
-        print "Moved {0} at {1}".format(self.direction, self.position)
-
-    def render(self):
         print "Rendered {0} at {1}".format(self.direction, self.position)
         if self.direction == "Right":
+            self.position[0] += 1
             x0 = self.position[0] * self.width
             y0 = (self.position[1] - 0.5) * self.height
             x1 = x0 - self.width
@@ -83,6 +66,7 @@ class SnakeHead(Widget):
             x2 = x0 - self.width
             y2 = y0 - self.height / 2
         elif self.direction == "Left":
+            self.position[0] -= 1
             x0 = (self.position[0] - 1) * self.width
             y0 = (self.position[1] - 0.5) * self.height
             x1 = x0 + self.width
@@ -90,6 +74,7 @@ class SnakeHead(Widget):
             x2 = x0 + self.width
             y2 = y0 + self.height / 2
         elif self.direction == "Up":
+            self.position[1] += 1
             x0 = (self.position[0] - 0.5) * self.width
             y0 = self.position[1] * self.height
             x1 = x0 - self.width / 2
@@ -97,6 +82,7 @@ class SnakeHead(Widget):
             x2 = x0 + self.width / 2
             y2 = y0 - self.height
         elif self.direction == "Down":
+            self.position[1] -= 1
             x0 = (self.position[0] - 0.5) * self.width
             y0 = (self.position[1] - 1) * self.height
             x1 = x0 + self.width / 2
@@ -110,9 +96,6 @@ class SnakeHead(Widget):
 
 class SnakeGame(Widget):
     snake = ObjectProperty(None)
-    # snake_head = ObjectProperty(None)
-    # tail_block_template = ObjectProperty(None)
-    # tail_position = ListProperty()
     score = NumericProperty(0)
     mov_start_pos = ListProperty()
     mov_current_pos = ListProperty()

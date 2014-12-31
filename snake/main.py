@@ -9,7 +9,47 @@ from kivy.properties import \
     BooleanProperty
 from kivy.clock import Clock
 from kivy.vector import Vector
+from kivy.graphics import Rectangle
 
+
+class Snake(Widget):
+    head = ObjectProperty(None)
+    tail = ObjectProperty(None)
+
+    def move(self):
+        next_tail_pos = list(self.head.position)
+        self.head.move()
+        self.head.render()
+        self.tail.add_block(next_tail_pos)
+        self.tail.render()
+
+    def set_next_direction(self, direction):
+        self.head.next_direction = direction
+
+class SnakeTail(Widget):
+    tail_size = NumericProperty(5)
+    blocks_positions = ListProperty()
+    tail_blocks = ListProperty()
+    block = ObjectProperty(None)
+
+    def add_block(self, pos):
+        self.blocks_positions.append(pos)
+        if len(self.blocks_positions)>self.tail_size:
+            self.blocks_positions.pop(0)
+        print self.blocks_positions
+
+    def render(self):
+        with self.canvas:
+            for block_pos in self.blocks_positions:
+                x = (block_pos[0]-0.5)*self.width
+                y = (block_pos[1]-0.5)*self.height
+                coord = (x, y)
+                block = Rectangle(pos=coord, size=(self.width, self.height))
+                self.tail_blocks.append(block)
+                if len(self.tail_blocks)>self.tail_size:
+                    last_block = self.tail_blocks.pop(0)
+                    self.canvas.remove(last_block)
+                print self.tail_blocks
 
 class SnakeHead(Widget):
     direction = OptionProperty(
@@ -17,7 +57,7 @@ class SnakeHead(Widget):
     next_direction = OptionProperty(
         "Right", options=["Up", "Down", "Left", "Right"])
     points = ListProperty([0] * 6)
-    x_position = NumericProperty(0)
+    x_position = NumericProperty(10)
     y_position = NumericProperty(10)
     position = ReferenceListProperty(x_position, y_position)
 
@@ -70,6 +110,9 @@ class SnakeHead(Widget):
 
 class SnakeGame(Widget):
     snake = ObjectProperty(None)
+    # snake_head = ObjectProperty(None)
+    # tail_block_template = ObjectProperty(None)
+    # tail_position = ListProperty()
     score = NumericProperty(0)
     mov_start_pos = ListProperty()
     mov_current_pos = ListProperty()
@@ -80,7 +123,6 @@ class SnakeGame(Widget):
 
     def update(self, dt):
         self.snake.move()
-        self.snake.render()
 
         # out of bounds
         if self.snake.x < self.x or self.snake.x > self.width \
@@ -101,14 +143,14 @@ class SnakeGame(Widget):
         and (abs(delta[0]) > 0.15 or abs(delta[1]) > 0.20):
             if abs(delta[0]) > abs(delta[1]):
                 if delta[0] > 0:
-                    self.snake.next_direction = "Right"
+                    self.snake.set_next_direction("Right")
                 else:
-                    self.snake.next_direction = "Left"
+                    self.snake.set_next_direction("Left")
             else:
                 if delta[1] > 0:
-                    self.snake.next_direction = "Up"
+                    self.snake.set_next_direction("Up")
                 else:
-                    self.snake.next_direction = "Down"
+                    self.snake.set_next_direction("Down")
             self.mov_triggered = True
             print "Changed direction"
 

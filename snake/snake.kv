@@ -1,11 +1,29 @@
 #:kivy 1.8.0
+
+<Snake>
+    head: snake_head
+    tail: snake_tail
+
+    SnakeHead:
+        id: snake_head
+        width: root.width
+        height: root.height
+
+    SnakeTail:
+        id: snake_tail
+        width: root.width
+        height: root.height
+
+<SnakeTail>
+
 <SnakeHead>
     canvas:
         Triangle:
             points: self.points
 
+
 <SnakeGame>:
-    snake: snake_head
+    snake: snake_object
 
     Label:
         font_size: 70
@@ -13,9 +31,7 @@
         top: root.top - 50
         text: "0"
 
-    SnakeHead:
-        id: snake_head
+    Snake:
+        id: snake_object
         width: root.width/20
         height: root.height/10
-
-

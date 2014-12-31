@@ -14,16 +14,16 @@
         width: root.width
         height: root.height
 
-<SnakeTail>
+<Fruit>
 
 <SnakeHead>
     canvas:
         Triangle:
             points: self.points
 
-
 <SnakeGame>:
     snake: snake_object
+    fruit: fruit_object
 
     Label:
         font_size: 70
@@ -33,5 +33,10 @@
 
     Snake:
         id: snake_object
-        width: root.width/20
-        height: root.height/10
+        width: root.width/root.col_number
+        height: root.height/root.row_number
+
+    Fruit:
+        id: fruit_object
+        width: root.width/root.col_number
+        height: root.height/root.row_number

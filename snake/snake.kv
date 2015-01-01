@@ -14,13 +14,6 @@
         width: root.width
         height: root.height
 
-<Fruit>
-
-<SnakeHead>
-    canvas:
-        Triangle:
-            points: self.points
-
 <SnakeGame>:
     snake: snake_object
     fruit: fruit_object
@@ -29,7 +22,7 @@
         font_size: 70
         center_x: root.width/4
         top: root.top - 50
-        text: "0"
+        text: str(root.score)
 
     Snake:
         id: snake_object

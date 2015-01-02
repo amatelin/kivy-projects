@@ -18,6 +18,8 @@ class Snake(Widget):
     tail = ObjectProperty(None)
 
     def move(self):
+        print self.height
+        print self.width
         next_tail_pos = list(self.head.position)
         self.head.move()
         self.tail.add_block(next_tail_pos)
@@ -81,7 +83,6 @@ class SnakeHead(Widget):
                 self.object_on_board = Triangle(points=self.points)            
 
     def move(self):
-        print "Rendered {0} at {1}".format(self.direction, self.position)
         if self.direction == "Right":
             self.position[0] += 1
             x0 = self.position[0] * self.width
@@ -114,7 +115,7 @@ class SnakeHead(Widget):
             y1 = y0 + self.height
             x2 = x0 - self.width / 2
             y2 = y0 + self.height
-
+        print "Rendered {0} at {1}".format(self.direction, self.position)
         self.points = [x0, y0, x1, y1, x2, y2]
         self.show()
 
@@ -162,6 +163,7 @@ class SnakeGame(Widget):
         print "Start"
         self.new_snake()
         self.update()
+        print self.width
 
     def reset(self):
         self.turn_counter = 0
@@ -180,6 +182,7 @@ class SnakeGame(Widget):
         start_position = (
             randint(2, self.col_number - 2), randint(2, self.row_number - 2))
         self.snake.head.position = start_position
+        print "shouldnt be shown here : {}".format(start_position)
         start_direction = randint(1, 4)
         if start_direction == 1:
             self.snake.head.direction = "Up"
@@ -200,6 +203,7 @@ class SnakeGame(Widget):
             self.fruit.remove()
 
     def update(self, *args):
+        print self.width
         if self.turn_counter == 0:
             self.fruit_rythme = self.fruit.interval + self.fruit.duration
             Clock.schedule_interval(self.remove_fruit, self.fruit_rythme / 1)
@@ -261,12 +265,14 @@ class SnakeGame(Widget):
 
 
 class SnakeApp(App):
+    game = ObjectProperty(None)
+
+    def on_start(self):
+        self.game.start()
 
     def build(self):
-        game = SnakeGame()
-        game.start()
-        # Clock.schedule_interval(game.update, 1.0 / game.time_coeff)
-        return game
+        self.game = SnakeGame()
+        return self.game
 
 
 if __name__ == "__main__":

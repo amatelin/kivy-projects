@@ -34,17 +34,49 @@
         width: root.width/root.col_number
         height: root.height/root.row_number
 
+<OptionsPopup>
+    title: "Options"
+    Button:
+        text: "Dismiss"
+        on_press: root.dismiss()
 
 <MainMenuScreen>:
     AnchorLayout:
-        Label: 
-            anchor_x: root.center
-            text: "Ouroboros"
+        anchor_x: "center"
 
-        Button:
-            size_hint: (.5, .5)
-            text: 'Goto settings'
-            on_press: root.manager.current = 'game_screen'
+        BoxLayout:
+            orientation: "vertical"
+            size_hint: (0.5, 1)
+            spacing: 10
+            padding: 50
+
+            Label:
+                text: "Ouroboros"
+                bold: True
+                font_size: 50
+
+            AnchorLayout:
+                anchor_x: "center"
+                BoxLayout:
+                    orientation: "vertical"
+                    size_hint: (0.75, 1)
+                    spacing: 10
+                    padding: 20
+                    Button:
+                        halign: "center"
+                        valign: "middle"
+                        text: "Play"
+                        on_press: root.manager.current = 'game_screen'
+
+                    Button:
+                        halign: "center"
+                        valign: "middle"
+                        text: "Options"
+                        on_press: root.show_popup()
+
+
+
+
 
 
 <GameScreen>:

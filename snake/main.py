@@ -1,5 +1,7 @@
 from kivy.app import App
 from kivy.uix.widget import Widget
+from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.uix.popup import Popup
 from kivy.properties import \
     OptionProperty, \
     ObjectProperty, \
@@ -10,7 +12,6 @@ from kivy.properties import \
 from kivy.clock import Clock
 from kivy.vector import Vector
 from kivy.graphics import Rectangle, Ellipse, Triangle
-from kivy.uix.screenmanager import ScreenManager, Screen
 from random import randint
 
 
@@ -19,7 +20,7 @@ class Snake(Widget):
     tail = ObjectProperty(None)
 
     def move(self):
-        print self.height 
+        print self.height
         print self.width
         next_tail_pos = list(self.head.position)
         self.head.move()
@@ -81,7 +82,7 @@ class SnakeHead(Widget):
                 self.state = True
             else:
                 self.canvas.remove(self.object_on_board)
-                self.object_on_board = Triangle(points=self.points)            
+                self.object_on_board = Triangle(points=self.points)
 
     def move(self):
         if self.direction == "Right":
@@ -120,6 +121,7 @@ class SnakeHead(Widget):
         self.points = [x0, y0, x1, y1, x2, y2]
         self.show()
 
+
 class Fruit(Widget):
     object_on_board = ObjectProperty(None)
     state = BooleanProperty(False)
@@ -142,6 +144,7 @@ class Fruit(Widget):
 
     def is_on_board(self):
         return self.state
+
 
 class SnakeGame(Widget):
     snake = ObjectProperty(None)
@@ -233,9 +236,9 @@ class SnakeGame(Widget):
             self.reset()
             self.start()
             return
-        
+
         self.turn_counter += 1
-        Clock.schedule_once(self.update, 1/self.time_coeff)
+        Clock.schedule_once(self.update, 1 / self.time_coeff)
 
     def on_touch_down(self, touch):
         self.mov_start_pos = touch.spos
@@ -262,8 +265,17 @@ class SnakeGame(Widget):
             self.mov_triggered = True
             print "Changed direction"
 
+
 class MainMenuScreen(Screen):
+
+    def show_popup(self):
+        optionspp = OptionsPopup()
+        optionspp.open()
+
+
+class OptionsPopup(Popup):
     pass
+
 
 class GameScreen(Screen):
     game_widget = ObjectProperty(None)

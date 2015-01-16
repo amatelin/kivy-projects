@@ -36,9 +36,31 @@
 
 <OptionsPopup>
     title: "Options"
-    Button:
-        text: "Dismiss"
-        on_press: root.dismiss()
+    size_hint: .5, .5
+    BoxLayout:
+        orientation: "vertical"
+        spacing: 20
+        GridLayout:
+            size_hint_y: .8
+            cols: 2
+            Label:
+                text: "Borders"  
+            Switch:
+                active: False
+            Label: 
+                text: "Game speed"
+            Slider:
+                id: speed_slider
+                max: 10
+                min: 1
+                value: 1
+        AnchorLayout:
+            anchor_x: "center"
+            size_hint: 1, .25
+            Button:
+                size_hint_x: 0.5
+                text: "Dismiss"
+                on_press: root.dismiss()
 
 <MainMenuScreen>:
     AnchorLayout:

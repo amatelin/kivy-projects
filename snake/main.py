@@ -10,6 +10,7 @@ from kivy.properties import \
 from kivy.clock import Clock
 from kivy.vector import Vector
 from kivy.graphics import Rectangle, Ellipse, Triangle
+from kivy.uix.screenmanager import ScreenManager, Screen
 from random import randint
 
 
@@ -18,7 +19,7 @@ class Snake(Widget):
     tail = ObjectProperty(None)
 
     def move(self):
-        print self.height
+        print self.height 
         print self.width
         next_tail_pos = list(self.head.position)
         self.head.move()
@@ -156,14 +157,13 @@ class SnakeGame(Widget):
     mov_current_pos = ListProperty()
     mov_triggered = BooleanProperty(False)
 
-    col_number = 20
-    row_number = 10
+    col_number = 16
+    row_number = 9
 
     def start(self):
         print "Start"
         self.new_snake()
         self.update()
-        print self.width
 
     def reset(self):
         self.turn_counter = 0
@@ -203,7 +203,6 @@ class SnakeGame(Widget):
             self.fruit.remove()
 
     def update(self, *args):
-        print self.width
         if self.turn_counter == 0:
             self.fruit_rythme = self.fruit.interval + self.fruit.duration
             Clock.schedule_interval(self.remove_fruit, self.fruit_rythme / 1)
@@ -263,16 +262,28 @@ class SnakeGame(Widget):
             self.mov_triggered = True
             print "Changed direction"
 
+class MainMenuScreen(Screen):
+    pass
+
+class GameScreen(Screen):
+    game_widget = ObjectProperty(None)
+
+    def on_enter(self):
+        self.game_widget.start()
+
 
 class SnakeApp(App):
-    game = ObjectProperty(None)
-
-    def on_start(self):
-        self.game.start()
 
     def build(self):
-        self.game = SnakeGame()
-        return self.game
+        sm = ScreenManager()
+        mms = MainMenuScreen(name='main_menu_screen')
+        gs = GameScreen(name='game_screen')
+
+        sm.add_widget(mms)
+        sm.add_widget(gs)
+
+        self.game = gs.game_widget
+        return sm
 
 
 if __name__ == "__main__":

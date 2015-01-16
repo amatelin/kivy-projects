@@ -20,8 +20,8 @@
 
     Label:
         font_size: 70
-        center_x: root.width/4
-        top: root.top - 50
+        center_x: root.x + root.width/root.col_number*2
+        top: root.top - root.height/root.row_number
         text: str(root.score)
 
     Snake:
@@ -33,3 +33,22 @@
         id: fruit_object
         width: root.width/root.col_number
         height: root.height/root.row_number
+
+
+<MainMenuScreen>:
+    AnchorLayout:
+        Label: 
+            anchor_x: root.center
+            text: "Ouroboros"
+
+        Button:
+            size_hint: (.5, .5)
+            text: 'Goto settings'
+            on_press: root.manager.current = 'game_screen'
+
+
+<GameScreen>:
+    game_widget: game_widget_instance
+
+    SnakeGame:
+        id: game_widget_instance

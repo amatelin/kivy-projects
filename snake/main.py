@@ -258,7 +258,7 @@ class SnakeGame(Widget):
         print "Poped ! at {}".format(coord)
 
     def remove_fruit(self, *args):
-        if self.fruit.is_on_board:
+        if self.fruit.is_on_board():
             self.fruit.remove()
 
     def update(self, *args):

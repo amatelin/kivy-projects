@@ -40,33 +40,42 @@
 
     title: "Options"
     size_hint: .75, .75
+
     BoxLayout:
         orientation: "vertical"
         spacing: 20
+
         GridLayout:
             size_hint_y: .8
             cols: 2
+
             Label:
                 text: "Borders"  
                 halign: "center"
+
             Switch:
                 id: border_option_instance
+
             Label: 
                 text: "Game speed"
                 halign: "center"
+
             Slider:
                 id: speed_option_instance
                 max: 10
                 min: 1
                 step: 1
                 value: 1
+
         AnchorLayout:
             anchor_x: "center"
             size_hint: 1, .25
+
             Button:
                 size_hint_x: 0.5
                 text: "Save changes"
                 on_press: root.dismiss()
+
 
 <MainMenuScreen>:
     AnchorLayout:
@@ -88,10 +97,12 @@
             AnchorLayout:
                 anchor_x: "center"
                 size_hint_y: .6
+
                 BoxLayout:
                     size_hint: .5, .5
                     orientation: "vertical"
                     spacing: 10
+
                     Button:
                         halign: "center"
                         valign: "middle"
@@ -99,7 +110,6 @@
                         on_press: root.manager.current = 'game_screen'
 
                     Button:
-                        size_hint:
                         halign: "center"
                         valign: "middle"
                         text: "Options"

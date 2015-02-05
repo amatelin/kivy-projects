@@ -20,21 +20,19 @@ class Snake(Widget):
     tail = ObjectProperty(None)
 
     def move(self):
-        print self.height
-        print self.width
         next_tail_pos = list(self.head.position)
         self.head.move()
         self.tail.add_block(next_tail_pos)
-        print self.tail.blocks_positions
 
     def remove(self):
         self.tail.remove()
-
-    def set_next_direction(self, direction):
-        self.head.direction = direction
+        self.head.remove()
 
     def get_position(self):
         return self.head.position
+
+    def get_full_position(self):
+        return self.head.position + self.tail.blocks_positions
 
     def set_position(self, position):
         self.head.position = position
@@ -65,7 +63,6 @@ class SnakeTail(Widget):
         or pos[1]<1 or pos[1]>SnakeGame.row_number:
             return 
 
-        print pos
         self.blocks_positions.append(pos)
         if len(self.blocks_positions) > self.size:
             self.blocks_positions.pop(0)
@@ -85,9 +82,9 @@ class SnakeTail(Widget):
 class SnakeHead(Widget):
     direction = OptionProperty(
         "Right", options=["Up", "Down", "Left", "Right"])
-    points = ListProperty([50] * 6)
-    x_position = NumericProperty(10)
-    y_position = NumericProperty(1)
+    points = ListProperty([0] * 6)
+    x_position = NumericProperty(0)
+    y_position = NumericProperty(0)
     position = ReferenceListProperty(x_position, y_position)
     object_on_board = ObjectProperty(None)
     state = BooleanProperty(False)
@@ -103,6 +100,12 @@ class SnakeHead(Widget):
             else:
                 self.canvas.remove(self.object_on_board)
                 self.object_on_board = Triangle(points=self.points)
+
+    def remove(self):
+        if self.is_on_board():
+            self.canvas.remove(self.object_on_board)
+            self.object_on_board = ObjectProperty(None)
+            self.state = False
 
     def move(self):
         if self.direction == "Right":
@@ -137,7 +140,6 @@ class SnakeHead(Widget):
             y1 = y0 + self.height
             x2 = x0 - self.width / 2
             y2 = y0 + self.height
-        print "Rendered {0} at {1}".format(self.direction, self.position)
         self.points = [x0, y0, x1, y1, x2, y2]
         self.show()
 
@@ -148,6 +150,15 @@ class Fruit(Widget):
     duration = NumericProperty(10)
     interval = NumericProperty(1)
 
+    def remove(self, *args):
+        if self.is_on_board():
+            self.canvas.remove(self.object_on_board)
+            self.object_on_board = ObjectProperty(None)
+            self.state = False
+
+    def is_on_board(self):
+        return self.state
+
     def pop(self, pos):
         self.pos = pos
         with self.canvas:
@@ -157,13 +168,7 @@ class Fruit(Widget):
             self.state = True
             self.object_on_board = Ellipse(pos=coord, size=self.size)
 
-    def remove(self):
-        self.canvas.remove(self.object_on_board)
-        self.state = False
-        self.object_on_board = ObjectProperty(None)
 
-    def is_on_board(self):
-        return self.state
 
 
 class SnakeGame(Widget):
@@ -189,11 +194,9 @@ class SnakeGame(Widget):
     running_time_coeff = NumericProperty(1)
 
     mov_start_pos = ListProperty()
-    mov_current_pos = ListProperty()
     mov_triggered = BooleanProperty(False)
 
     def start(self):
-        print "Start"
         # if border_option is active, draw rectangle around the game area
         if self.border_option:
             with self.canvas.before:
@@ -218,13 +221,12 @@ class SnakeGame(Widget):
 
         # remove the snake widget (+ fruit if need be)
         self.snake.remove()
-        if self.fruit.is_on_board():
-            self.remove_fruit()
+        self.fruit.remove()
 
         # unschedule all events (they will be properly rescheduled by the
         # restart mechanism)
         Clock.unschedule(self.pop_fruit)
-        Clock.unschedule(self.remove_fruit)
+        Clock.unschedule(self.fruit.remove)
         Clock.unschedule(self.update)
 
     def new_snake(self):
@@ -237,35 +239,30 @@ class SnakeGame(Widget):
         rand_index = randint(0, 3)
 
         # handle consequently (yeah that's messy needs refact)
-        directions = ["Up", "Down", "Left", "Right"]
-        self.snake.set_direction(directions[rand_index])
+        start_direction = ["Up", "Down", "Left", "Right"][rand_index]
+        self.snake.set_direction(start_direction)
 
     def pop_fruit(self, *args):
         # get random coordinates for the fruit
-        coord = self.random_coord()
+        coord = [randint(1, self.col_number), randint(1, self.row_number)]
 
         # total space occupied by snake
-        snake_space = self.snake.tail.blocks_positions + \
-            self.snake.head.position
+        snake_space = self.snake.get_full_position()
 
         # if the coordinates are on a space occupied by the snake, re-draw
         while coord in snake_space:
             print "re-drawing"
-            coord = self.random_coord()
+            coord = [randint(1, self.col_number), randint(1, self.row_number)]
 
         # pop fruit widget
         self.fruit.pop(coord)
         print "Poped ! at {}".format(coord)
 
-    def remove_fruit(self, *args):
-        if self.fruit.is_on_board():
-            self.fruit.remove()
-
     def update(self, *args):
         if self.turn_counter == 0:
             self.fruit_rythme = self.fruit.interval + self.fruit.duration
             Clock.schedule_interval(
-                self.remove_fruit, self.fruit_rythme / self.running_time_coeff)
+                self.fruit.remove, self.fruit_rythme / self.running_time_coeff)
         elif self.turn_counter == self.fruit.interval:
             self.pop_fruit()
             Clock.schedule_interval(
@@ -275,24 +272,20 @@ class SnakeGame(Widget):
         # if game with no borders, check if snake is about to leave the screen
         # if so, replace to corresponding opposite border
         if not self.border_option:
-            self.is_outbound()    
+            self.handle_outbound()    
 
         # move snake
-        print "Start position {}".format(self.snake.head.position)
         self.snake.move()
-        print "Position after move {}".format(self.snake.head.position)
 
         # check for defeat
         if self.is_defeated():
-            print "LOOOSER"
+            self.reset()
             SnakeApp.screen_manager.current = "main_menu_screen"
-            # self.reset()
-            # self.start()
             return
 
         if self.fruit.is_on_board():
             if self.snake.get_position() == self.fruit.pos:
-                self.remove_fruit()
+                self.fruit.remove()
                 self.score += 1
                 self.snake.tail.size += 1
                 self.running_time_coeff *= 1.05
@@ -300,7 +293,7 @@ class SnakeGame(Widget):
         self.turn_counter += 1
         Clock.schedule_once(self.update, 1 / self.running_time_coeff)
 
-    def is_outbound(self):
+    def handle_outbound(self):
         position = self.snake.get_position()
         direction = self.snake.get_direction()
 
@@ -320,7 +313,7 @@ class SnakeGame(Widget):
             self.snake.set_position([position[0], 0])
 
     def is_defeated(self):
-        snake_position = self.snake.head.position
+        snake_position = self.snake.get_position()
 
         if snake_position in self.snake.tail.blocks_positions:
             return True
@@ -342,26 +335,21 @@ class SnakeGame(Widget):
         self.mov_triggered = False
 
     def on_touch_move(self, touch):
-        self.mov_current_pos = touch.spos
-
-        delta = Vector(*self.mov_current_pos) - Vector(*self.mov_start_pos)
+        delta = Vector(*touch.spos) - Vector(*self.mov_start_pos)
         if (self.mov_triggered == False) \
                 and (abs(delta[0]) > 0.1 or abs(delta[1]) > 0.1):
             if abs(delta[0]) > abs(delta[1]):
                 if delta[0] > 0:
-                    self.snake.set_next_direction("Right")
+                    self.snake.set_direction("Right")
                 else:
-                    self.snake.set_next_direction("Left")
+                    self.snake.set_direction("Left")
             else:
                 if delta[1] > 0:
-                    self.snake.set_next_direction("Up")
+                    self.snake.set_direction("Up")
                 else:
-                    self.snake.set_next_direction("Down")
+                    self.snake.set_direction("Down")
             self.mov_triggered = True
-            print "Changed direction"
 
-    def random_coord(self):
-        return [randint(1, self.col_number), randint(1, self.row_number)]
 
 
 class MainMenuScreen(Screen):
@@ -386,9 +374,6 @@ class GameScreen(Screen):
 
     def on_enter(self):
         self.game_widget.start()
-
-    def prout(self):
-        pass
 
 
 class SnakeApp(App):

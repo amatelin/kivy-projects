@@ -1,13 +1,13 @@
 [app]
 
 # (str) Title of your application
-title = Orobouros
+title = Ouroboros
 
 # (str) Package name
-package.name = test
+package.name = ouroboros
 
 # (str) Package domain (needed for android/ios packaging)
-package.domain = org.test
+package.domain = org.ouroboros
 
 # (str) Source code where the main.py live
 source.dir = .
@@ -29,7 +29,7 @@ source.include_exts = py,png,jpg,kv,atlas
 #version.filename = %(source.dir)s/main.py
 
 # (str) Application versioning (method 2)
-version = 0.0.1
+version = 1.0.0
 
 # (list) Application requirements
 # comma seperated e.g. requirements = sqlite3,kivy
